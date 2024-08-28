@@ -1,0 +1,8 @@
+.env 
+config/ __pycache__
+__pycache__
+apps/user/__pycache__
+apps/book/__pycache__
+celerybeat-schedule 
+dump.rdb 
+backend 
