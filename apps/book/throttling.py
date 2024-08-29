@@ -31,7 +31,6 @@ class BookThrottle(BaseThrottle):
             if current_time - timestamp < 3600
         ]
 
-        # Determine the rate limit based on whether the user is authenticated
         if request.user and request.user.is_authenticated:
             request_limit = 5 
             throttled_message = "Request limit exceeded: You can make up to 5 requests per hour."
@@ -39,7 +38,6 @@ class BookThrottle(BaseThrottle):
             request_limit = 3
             throttled_message = "Request limit exceeded: You can make up to 3 requests per hour."
 
-        # Allow the request if the user has not exceeded their request limit
         if len(self.request_history[user_ident]) < request_limit:
             self.request_history[user_ident].append(current_time)
             return True
@@ -56,9 +54,6 @@ class BookThrottle(BaseThrottle):
         return max(0, 3600 - (time.time() - last_request_time))
 
     def get_ident(self, request):
-        """
-        Identify the user by their user ID if authenticated; fall back to IP address if not.
-        """
         if request.user and request.user.is_authenticated:
             return request.user.id  
         else:

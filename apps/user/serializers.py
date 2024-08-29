@@ -12,6 +12,7 @@ from rest_framework import serializers
 
 from apps.user.tasks import send_verification_email_task
 from apps.user.utils import send_reset_email
+
 User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):

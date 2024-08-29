@@ -1,10 +1,12 @@
 import requests
+
 from django.core.management.base import BaseCommand
+
 from apps.book.models import Book
 from apps.user.models import CustomUser
 
 class Command(BaseCommand):
-    help = "Search and fetch book details from Google Books API and insert them into the Book model by keyword"
+    help = " fetch book details from Google Books API and insert them into the Book model by keyword"
 
     def add_arguments(self, parser):
         parser.add_argument('query', nargs='+', type=str)
@@ -36,7 +38,6 @@ class Command(BaseCommand):
             Book.objects.create(
                 title=book_details['title'],
                 author=book_details['authors'],
-                # description=book_details['description'],
                 created_by=CustomUser.objects.first(),
                 is_active=True
                 )

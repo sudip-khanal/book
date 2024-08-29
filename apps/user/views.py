@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.generics import GenericAPIView
-from rest_framework.throttling import ScopedRateThrottle
+
 from apps.user.models import CustomUser
 from apps.user.serializers import (
     UserSerializer,
@@ -66,9 +66,7 @@ class UserLogin(GenericAPIView):
     Scoped throttling is applied to limit the number of login attempts.
     """
     serializer_class = LoginSerializer
-    # throttle_classes = [ScopedRateThrottle] 
-    # throttle_scope = 'user_login' 
-
+  
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():

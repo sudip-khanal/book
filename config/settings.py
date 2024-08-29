@@ -178,15 +178,7 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 
-#        'DEFAULT_THROTTLE_CLASSES': [
-#         'rest_framework.throttling.AnonRateThrottle',
-#         'rest_framework.throttling.UserRateThrottle'
-#     ],
-#     'DEFAULT_THROTTLE_RATES': {
-#         'anon': '3/minute',
-#         # 'user': '5/hour',
-#         'retrive_book':'5/minute',
-#     }
+
  }
 #email
 EMAIL_HOST = "smtp.gmail.com"
@@ -206,7 +198,7 @@ CACHES = {
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         },
-        "TIMEOUT": 300,  # Cache timeout in seconds
+        "TIMEOUT": 300, 
     }
 }
 
@@ -224,13 +216,13 @@ from celery.schedules import crontab
 CELERY_BEAT_SCHEDULE = {
     'create-users': {
         'task': 'apps.user.tasks.create_user_task', 
-        'schedule': crontab(hour=0,minute=3), # Every day at midnight
+        'schedule': crontab(hour=0,minute=3),
     },
 
     'fetch-book-from-google-api-create-books': {
         'task': 'apps.book.tasks.create_book_task', 
         'args': ('django'),
-        'schedule': crontab(hour=0, minute=0),  # Every day at midnight
+        'schedule': crontab(hour=0, minute=0), 
     },
 }
 

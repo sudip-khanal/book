@@ -16,11 +16,11 @@ class Book(models.Model):
 
 
 # Model representing a user's favorite book
+
 class Favorite(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
 
-    #  a user can not favorite the same book more than once
     class Meta:
         unique_together = ('user', 'book')
 
@@ -38,4 +38,5 @@ class Review(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s Review  book: {self.book}"
+
 
