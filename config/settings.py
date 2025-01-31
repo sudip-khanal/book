@@ -187,8 +187,7 @@ EMAIL_HOST_USER=env('G_MAIL')
 EMAIL_HOST_PASSWORD =env('GMAIL_PASS')
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = env('G_MAIL')
-SITE_URL = env('SITE_URL')
-
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 
 CACHES = {
@@ -216,13 +215,13 @@ from celery.schedules import crontab
 CELERY_BEAT_SCHEDULE = {
     'create-users': {
         'task': 'apps.user.tasks.create_user_task', 
-        'schedule': crontab(hour=0,minute=3),
+        'schedule': crontab(hour=10,minute=3),
     },
 
     'fetch-book-from-google-api-create-books': {
         'task': 'apps.book.tasks.create_book_task', 
         'args': ('django'),
-        'schedule': crontab(hour=0, minute=0), 
+        'schedule': crontab(hour=10, minute=0), 
     },
 }
 

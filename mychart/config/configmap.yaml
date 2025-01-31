@@ -1,0 +1,35 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  labels:
+    name: {{ template "mychart.fullname" . }}-api-secret
+    component: api
+    environment: {{ .Values.environment }}
+    release: {{ .Release.Name }}
+data:
+  APP_ENVIRONMENT: {{ .Values.environment | upper | quote }}
+  APP_DOMAIN: {{ required "env.APP_DOMAIN" .Values.environment | upper | quote }}
+  DJANGO_TIME_ZONE: {{ .Values.env.DJANGO_TIME_ZONE }}
+  DJANGO_DEBUG: {{ .Values.env.DJANGO_DEBUG | quote }}
+  DJANGO_ALLOWED_HOST: {{ .Values.env.DJANGO_ALLOWED_HOST | quote }}
+  APP_HTTP_PROTOCOL: {{ .Values.env.APP_HTTP_PROTOCOL | quote }}
+
+  {{- if .Values.redis.enabled }}
+  # Celery
+  CELERY_REDIS_URL: "redis://{{ printf "%s-master" (include "common.names.fullname" .Subcharts.redis) }}:6379/0"
+  CELERY_BROKER_URL: "redis://{{ printf "%s-master" (include "common.names.fullname" .Subcharts.redis) }}:6379/0"
+  CELERY_RESULT_BACKEND: "redis://{{ printf "%s-master" (include "common.names.fullname" .Subcharts.redis) }}:6379/0"
+  # Cache
+  DJANGO_CACHE_REDIS_URL: "redis://{{ printf "%s-master" (include "common.names.fullname" .Subcharts.redis) }}:6379/1"
+  {{- else }}
+  # Celery
+  CELERY_BROKER_URL: {{ required "env.CELERY_BROKER_URL" .Values.env.CELERY_BROKER_URL | quote }}
+  CACHE_REDIS_URL: {{ required "env.CACHE_REDIS_URL" .Values.env.CACHE_REDIS_URL | quote }}
+  CELERY_RESULT_BACKEND: {{ required "env.CELERY_RESULT_BACKEND" .Values.env.CELERY_RESULT_BACKEND | quote }}
+  # Cache
+  DJANGO_CACHE_REDIS_URL: {{ required "env.DJANGO_CACHE_REDIS_URL" .Values.env.DJANGO_CACHE_REDIS_URL | quote }}
+  {{- end }}
+
+  # Sentry
+  SENTRY_TRACES_SAMPLE_RATE: {{ .Values.env.SENTRY_TRACES_SAMPLE_RATE | quote }}
+  SENTRY_PROFILE_SAMPLE_RATE: {{ .Values.env.SENTRY_PROFILE_SAMPLE_RATE | quote }}

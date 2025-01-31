@@ -1,0 +1,57 @@
+{{- if Values.api.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "mychart.fullname" . }}-api
+  labels:
+    component: api
+    environment: {{ .Values.environment }}
+    releqse: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{- template "mychart.selectorLabels" . }}
+      release: {{ .Release.Name }}
+      run: {{ .Release.Name }}-api
+  template:
+    metadata:
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      labels:
+        app: {{- template "mychart.selectorLabels" . }}
+        release: {{ .Release.Name }}
+        run: {{ .Release.Name }}-api
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}-api
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["bash", "/code/scripts/run_prod.sh"]
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.containerPort }}
+              protocol: TCP
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            requests:
+              cpu: {{ .Values.api.resources.requests.cpu }}
+              memory: {{ .Values.api.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.api.resources.limits.cpu }}
+              memory: {{ .Values.api.resources.limits.memory }}
+          envFrom:
+            - secretRef:
+                name: {{ template "tc-chatbot-backend.fullname" . }}-api-secret
+            - configMapRef:
+                name: {{ template "tc-chatbot-backend.fullname" . }}-api-configmap
+
+{{- end }}

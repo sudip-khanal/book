@@ -1,0 +1,46 @@
+{{ - if VALUES.celery.worker.enabled }}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ printf "%s-%s" .Release.Name .Values.celery.worker.componentName }}
+  labels:
+    component: celery-worker 
+    environment: {{ .Values.environment }}
+    release: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.celery.worker.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "mychart.name" . }}
+      release: {{ .Release.Name }}
+      run: {{ .Release.Name}}-worker
+    template:
+      metadata:
+        {% comment %} annotations:
+          checksum/secret: {{ include (print .Template.BasePath "/config/secret.yaml") . | sha256sum }}
+          checksum/configmap: {{ include (print .Template.BasePath "/config/configmap.yaml") . | sha256sum }} {% endcomment %}
+        labels:
+          app: {{ template "mychart.name" . }}
+          release: {{ .Release.Name }}
+          run: {{ .Release.Name }}-worker
+    spec:
+        containers:
+          - name: {{ .Chart.Name }}-worker
+            image: "{{ .Values.image.name }}:{{ .Values.image.tag }}"
+            imagePullPolicy: {{ .Values.image.pullPolicy }}
+            command: ["bash", "/code/scripts/run_worker.sh"]
+              requests:
+                cpu: {{ .Values.celery.worker.resources.requests.cpu }}
+                memory: {{ .Values.celery.worker.resources.requests.memory }}
+              limits:
+                cpu: {{ .Values.celery.worker.resources.limits.cpu }}
+                memory: {{ .Values.celery.worker.resources.limits.memory }}
+            envFrom:
+              - secretRef:
+                  name: {{ template "mychart.fullname" . }}-api-secret
+              - configMapRef:
+                  name: {{ template "mychart.fullname" . }}-api-configmap
+  
+{{ - end }}
+  

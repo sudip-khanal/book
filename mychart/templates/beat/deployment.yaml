@@ -1,0 +1,48 @@
+{{- if .Values.celery.beat.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ printf "%s-%s" .Release.Name .Values.celery.beat.componentName }}
+  labels:
+    comment:celery-beat
+    environment: {{ .Values.environment }}
+    release: {{ .Release.Name }}
+  
+spec:
+  replicas: {{ .Values.celery.beat.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "mychart.name" . }}
+      release: {{ .Release.Name }}
+      run: {{ .Release.Name }}-beat
+  template:
+    metadata:
+      annotations:
+        checksum/secret: {{ include (print .Template.BasePath "/config/secret.yaml") . | sha256sum }}
+        checksum/configmap: {{ include (print .Template.BasePath "/config/configmap.yaml") . | sha256sum }}
+      labels:
+        app: {{ template "mychart.name" . }}
+        release: {{ .Release.Name }}
+        run: {{ .Release.Name }}-beat
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}-beat
+          image: "{{ .Values.image.name }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          # TODO: Add health-check
+          command: ["bash", "/code/scripts/run_beat.sh"]
+          resources:
+            requests:
+              cpu: {{ .Values.celery.beat.resources.requests.cpu }}
+              memory: {{ .Values.celery.beat.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.celery.beat.resources.limits.cpu }}
+              memory: {{ .Values.celery.beat.resources.limits.memory }}
+          envFrom:
+            - secretRef:
+                name: {{ template "mychart.fullname" . }}-api-secret
+            - configMapRef:
+                name: {{ template "mychart.fullname" . }}-api-configmap
+
+{{- end }}
+    
