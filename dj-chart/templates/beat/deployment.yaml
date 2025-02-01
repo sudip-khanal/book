@@ -1,0 +1,48 @@
+{{- if .Values.beat.enabled }}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "dj-chart.fullname" . }}-beat
+  labels:
+    component: beat-deployment
+    environment: {{ .Values.environment }}
+    release: {{ .Release.Name }}
+    # XXX: Add global lables?
+spec:
+  replicas: {{ .Values.beat.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "dj-chart.name" . }}
+      release: {{ .Release.Name }}
+      run: {{ .Release.Name }}-beat
+  template:
+    metadata:
+      annotations:
+        checksum/secret: {{ include (print .Template.BasePath "/config/secret.yaml") . | sha256sum }}
+        checksum/configmap: {{ include (print .Template.BasePath "/config/configmap.yaml") . | sha256sum }}
+      labels:
+        app: {{ template "dj-chart.name" . }}
+        release: {{ .Release.Name }}
+        run: {{ .Release.Name }}-beat
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}-beat
+          image: "{{ .Values.beat.image.repository }}:{{ .Values.beat.image.tag }}"
+          imagePullPolicy: {{ .Values.beat.image.pullPolicy }}
+          # TODO: Add health-check
+          command: ["bash", "/app/scripts/run_beat.sh"]
+          resources:
+            requests:
+              cpu: {{ .Values.beat.resources.requests.cpu }}
+              memory: {{ .Values.beat.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.beat.resources.limits.cpu }}
+              memory: {{ .Values.beat.resources.limits.memory }}
+          envFrom:
+            - secretRef:
+                name: {{ template "dj-chart.fullname" . }}-api-secret
+            - configMapRef:
+                name: {{ template "dj-chart.fullname" . }}-api-configmap
+
+{{- end }}

@@ -117,7 +117,7 @@ DATABASES = {
         'NAME':env('DB_NAME'), 
         'USER':env('DB_USER'),
         'PASSWORD':env('DB_PASS'),
-        'HOST': 'db', 
+        'HOST': env('DB_HOST'),
         'PORT':env('DB_PORT')
        }
 }
@@ -218,10 +218,5 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': crontab(hour=10,minute=3),
     },
 
-    'fetch-book-from-google-api-create-books': {
-        'task': 'apps.book.tasks.create_book_task', 
-        'args': ('django'),
-        'schedule': crontab(hour=10, minute=0), 
-    },
 }
 

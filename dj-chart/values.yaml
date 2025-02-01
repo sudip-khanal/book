@@ -1,0 +1,107 @@
+environment: test
+
+postgresql:
+  enabled: true
+  architecture: standalone
+  auth:
+    database: testdb
+    username: test
+    password: test
+  primary:
+    resourcesPreset: nano
+    persistence:
+      enabled: true
+      size: 1Gi
+      storageClass: standard
+  service:
+    port: 5432
+
+redis:
+  enabled: true
+  architecture: standalone
+  auth:
+    enabled: false
+  master:
+    resourcesPreset: nano
+    storageClass: standard  
+
+api:
+  enabled: true
+  replicaCount: 1
+  containerPort: 80
+  image:
+    repository: sudipkhanal/book-web
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  service:
+    port: 8000
+    type: ClusterIP
+  resources:
+    requests:
+      cpu: "200m"
+      memory: 1Gi
+    limits:
+      cpu: "2000m"
+      memory: 2Gi
+
+worker:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: sudipkhanal/book-worker
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  resources:
+    requests:
+      cpu: "200m"
+      memory: 1Gi
+    limits:
+      cpu: "2000m"
+      memory: 2Gi
+
+beat:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: sudipkhanal/book-beat
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  resources:
+    requests:
+      cpu: "200m"
+      memory: 1Gi
+    limits:
+      cpu: "2000m"
+      memory: 2Gi
+
+ingress:
+  enabled: false
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths:
+
+
+env:
+  DJANGO_SECRET_KEY: z_v77g1nmeymo(9q6(5f2%w5t9&n$#&p278*=gmmy@k411ves
+  DJANGO_DEBUG: true
+  DJANGO_ALLOWED_HOST: "*"
+  DB_NAME: testdb
+  DB_USER: test
+  DB_PASS: test
+  DB_HOST: db
+  DB_PORT: 5432
+  CELERY_REDIS_URL: "redis://redis:6379/0"
+  CELERY_BROKER_URL: "redis://redis:6379/0"
+  CELERY_RESULT_BACKEND: "redis://redis:6379/0"
+  DJANGO_CACHE_REDIS_URL: "redis://redis:6379/1"
+
+secrets:
+  DJANGO_SECRET_KEY: z_v77g1nmeymo(9q6(5f2%w5t9&n$#&p278*=gmmy@k411ves
+
+  # Database (required if postgresql.enabled if false)
+  DATABASE_NAME: testdb
+  DATABASE_USER: test
+  DATABASE_PASSWORD: test
+  DATABASE_HOST: db
+  DATABASE_PORT: 5432

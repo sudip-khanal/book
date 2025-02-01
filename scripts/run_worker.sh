@@ -1,3 +1,3 @@
 #!/bin/bash -x
 
-celery -A main worker --loglevel=info --max-tasks-per-child=20
+celery -A config worker --loglevel=info --max-tasks-per-child=20

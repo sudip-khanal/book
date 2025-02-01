@@ -1,11 +1,11 @@
-{{- if .Values.ingress.api.enabled }}
+{{- if .Values.ingress.enabled }}
 
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ template "mychart.fullname" . }}-api-ingress
+  name: {{ template "dj-chart.fullname" . }}-api-ingress
   labels:
-    app: {{ template "mychart.fullname" . }}
+    app: {{ template "dj-chart.name" . }}
     component: api-service
     environment: {{ .Values.environment }}
     release: {{ .Release.Name }}
@@ -19,7 +19,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{ template "mychart.fullname" . }}-api-service
+                name: {{ template "dj-chart.fullname" . }}-api-svc
                 port:
                   number: 80
 
