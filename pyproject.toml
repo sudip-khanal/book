@@ -24,6 +24,7 @@ django-redis = "^5.4.0"
 pytest-django = "^4.8.0"
 factory-boy = "^3.3.1"
 gunicorn = "^23.0.0"
+sentry-sdk = {extras = ["django"], version = "^2.20.0"}
 
 
 [build-system]

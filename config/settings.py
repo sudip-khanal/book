@@ -11,6 +11,11 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 import os 
+import logging
+
+import  sentry_sdk 
+logger = logging.getLogger(__name__)
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 PROJECT_DIR = os.path.dirname(os.path.dirname(
     os.path.dirname(os.path.abspath(__file__))))
@@ -19,7 +24,8 @@ ROOT_DIR = os.path.dirname(PROJECT_DIR)
 
 APPS_DIR = os.path.join(PROJECT_DIR, 'apps')
 
-BASE_DIR = os.path.join(PROJECT_DIR, 'config')
+BASE_DIR = os.path.join(PROJECT_DIR,'config')
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 ###environment setup#####
@@ -35,6 +41,8 @@ env = environ.Env(
     DB_HOST=str,
     CELERY_REDIS_URL=str,
     CELERY_RESULT_BACKEND=str,
+    SENTRY_DSN=(str, None),
+    SENTRY_SAMPLE_RATE=(float, 1.0),
 
 
 )
@@ -219,4 +227,13 @@ CELERY_BEAT_SCHEDULE = {
     },
 
 }
+# Sentry Config
 
+SENTRY_DSN = env("SENTRY_DSN")
+SENTRY_SAMPLE_RATE = env("SENTRY_SAMPLE_RATE")
+SENTRY_CONFIG = {
+    "dsn": SENTRY_DSN,
+    "send_default_pii": True,
+    "traces_sample_rate": SENTRY_SAMPLE_RATE,
+}
+sentry_sdk.init(**SENTRY_CONFIG)

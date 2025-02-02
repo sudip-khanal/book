@@ -75,11 +75,13 @@ beat:
       memory: 2Gi
 
 ingress:
-  enabled: false
-  annotations: {}
-  hosts:
-    - host: chart-example.local
-      paths:
+  className: nginx
+  api:
+    enabled: false
+    annotations: {}
+    hosts:
+      - host: book-app.local
+        paths:
 
 
 env:
